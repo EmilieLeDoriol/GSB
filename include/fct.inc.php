@@ -66,6 +66,16 @@ function getMois($date){
 		return $annee.$mois;
 }
 
+/**
+ * retourne le jour de la date actuelle
+ 
+ * @param $date
+ * @return le jour
+ */
+function getJour($date) {
+        return substr($date,0,2);
+}
+
 /* gestion des erreurs*/
 /**
  * Indique si une valeur est un entier positif ou nul

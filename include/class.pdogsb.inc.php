@@ -63,6 +63,7 @@ class PdoGsb{
         
 /**
  * Retourne les informations d'un comptable
+ 
  * @param $login
  * @param $mdp
  * @return l'id, le nom et le prénom sous la forme d'un tableau associatif 
@@ -275,10 +276,10 @@ class PdoGsb{
 			$numAnnee =substr( $mois,0,4);
 			$numMois =substr( $mois,4,2);
 			$lesMois["$mois"]=array(
-		     "mois"=>"$mois",
-		    "numAnnee"  => "$numAnnee",
+                        "mois"=>"$mois",
+                        "numAnnee"  => "$numAnnee",
 			"numMois"  => "$numMois"
-             );
+                        );
 			$laLigne = $res->fetch(); 		
 		}
 		return $lesMois;
@@ -311,5 +312,24 @@ class PdoGsb{
 		where fichefrais.idvisiteur ='$idVisiteur' and fichefrais.mois = '$mois'";
 		PdoGsb::$monPdo->exec($req);
 	}
+        
+/**
+ * Retourne les infos des Visiteurs (nom, prenom, id)
+ 
+ * @return $lesVisiteurs 
+ */
+        public function getInfosVisiteurs() {
+                $req = "select * from visiteur order by nom asc";
+                $res = PdoGsb::$monPdo->query($req);
+                $lesVisiteurs = $res->fetchAll();
+		return $lesVisiteurs;
+        }
+        
+        public function getNomPrenom($idVisiteur) {
+            $req = "select * from visiteur where id = '$idVisiteur'";
+            $res = PdoGsb::$monPdo->query($req);
+            $laLigne = $res->fetch();
+            return $laLigne;
+        }
 }
 ?>

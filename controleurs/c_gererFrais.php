@@ -1,21 +1,21 @@
 <?php
-include("vues/v_sommaire.php");
-$idVisiteur = $_SESSION['idVisiteur'];
+include("vues/v_sommaireVisiteur.php");
+$id = $_SESSION['id'];
 $mois = getMois(date("d/m/Y"));
 $numAnnee =substr( $mois,0,4);
 $numMois =substr( $mois,4,2);
 $action = $_REQUEST['action'];
 switch($action){
 	case 'saisirFrais':{
-		if($pdo->estPremierFraisMois($idVisiteur,$mois)){
-			$pdo->creeNouvellesLignesFrais($idVisiteur,$mois);
+		if($pdo->estPremierFraisMois($id,$mois)){
+			$pdo->creeNouvellesLignesFrais($id,$mois);
 		}
 		break;
 	}
 	case 'validerMajFraisForfait':{
 		$lesFrais = $_REQUEST['lesFrais'];
 		if(lesQteFraisValides($lesFrais)){
-	  	 	$pdo->majFraisForfait($idVisiteur,$mois,$lesFrais);
+	  	 	$pdo->majFraisForfait($id,$mois,$lesFrais);
 		}
 		else{
 			ajouterErreur("Les valeurs des frais doivent être numériques");
@@ -32,7 +32,7 @@ switch($action){
 			include("vues/v_erreurs.php");
 		}
 		else{
-			$pdo->creeNouveauFraisHorsForfait($idVisiteur,$mois,$libelle,$dateFrais,$montant);
+			$pdo->creeNouveauFraisHorsForfait($id,$mois,$libelle,$dateFrais,$montant);
 		}
 		break;
 	}
@@ -42,8 +42,8 @@ switch($action){
 		break;
 	}
 }
-$lesFraisHorsForfait = $pdo->getLesFraisHorsForfait($idVisiteur,$mois);
-$lesFraisForfait= $pdo->getLesFraisForfait($idVisiteur,$mois);
+$lesFraisHorsForfait = $pdo->getLesFraisHorsForfait($id,$mois);
+$lesFraisForfait= $pdo->getLesFraisForfait($id,$mois);
 include("vues/v_listeFraisForfait.php");
 include("vues/v_listeFraisHorsForfait.php");
 
