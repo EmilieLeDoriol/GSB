@@ -3,7 +3,7 @@
             <form action="index.php?uc=validerFrais&action=voirFraisVisiteur" method="post">
                     <h1> Validation des frais par visiteur </h1>
                     <label>Choisir le visiteur :</label>
-                            <select name="visiteur">
+                            <select name="choixVisiteur">
                                 <?php
                                         foreach ($lesVisiteurs as $unVisiteur) {
                                             $nom = $unVisiteur['nom'];

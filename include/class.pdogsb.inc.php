@@ -324,12 +324,116 @@ class PdoGsb{
                 $lesVisiteurs = $res->fetchAll();
 		return $lesVisiteurs;
         }
-        
+/**
+ * Retourne les infods d'un visiteur
+  
+ * @param $idVisiteur
+ * @return $laLigne
+ */
         public function getNomPrenom($idVisiteur) {
             $req = "select * from visiteur where id = '$idVisiteur'";
             $res = PdoGsb::$monPdo->query($req);
             $laLigne = $res->fetch();
             return $laLigne;
+        }
+/**
+ * Retourne les informations d'un frais hors forfait
+ * 
+ * @param $idHorsForfait
+ * @return une ligne comportant les informations du frais hors forfait
+ */
+        public function getInfosHorsForfait($idHorsForfait) {
+            $req = "select * from lignefraishorsforfait where id = '$idHorsForfait'";
+            $res = PdoGsb::$monPdo->query($req);
+            $laLigne = $res->fetch();
+            return $laLigne;
+        }
+/**
+ * Refuse le frais hors forfait passé en paramètre en ajoutant REFUSE au début de son libellé
+ * 
+ * @param $idFrais
+ */
+        public function refuserFrais($idHorsForfait) {
+            $req = "update lignefraishorsforfait set libelle = CONCAT('REFUSE ', libelle) where id= '$idHorsForfait'";
+            PdoGsb::$monPdo->exec($req);
+        }
+/**
+ * Reporte le frais hors forfait au mois suivant
+ * 
+ * @param $idVisiteur
+ * @param $mois
+ * @param $libelle
+ * @param $date
+ * @param $montant
+ */
+        public function reporterFrais($idVisiteur, $mois, $libelle, $date, $montant) {
+            $moisFutur = moisFutur($mois);
+            if ($this->estPremierFraisMois($idVisiteur,$moisFutur)) {
+                $req = "insert into fichefrais(idvisiteur,mois,nbJustificatifs,montantValide,dateModif,idEtat) 
+                values('$idVisiteur','$moisFutur',0,0,now(),'CR')";
+                PdoGsb::$monPdo->exec($req);
+                $lesIdFrais = $this->getLesIdFrais();
+                foreach($lesIdFrais as $uneLigneIdFrais){
+                        $unIdFrais = $uneLigneIdFrais['idfrais'];
+                        $req = "insert into lignefraisforfait(idvisiteur,mois,idFraisForfait,quantite) 
+                        values('$idVisiteur','$moisFutur','$unIdFrais',0)";
+                        PdoGsb::$monPdo->exec($req);
+                 }
+                PdoGsb::$monPdo->exec($req);
+            }
+            $this->creeNouveauFraisHorsForfait($idVisiteur,$moisFutur,$libelle,$date,$montant);
+           
+        }
+        
+/**
+ * 
+ * @param $idVisiteur
+ * @param $mois
+ * @param $lesFrais
+ * @return $montantValide
+ */  
+        public function calculerMontant($idVisiteur, $mois, $lesFrais) {
+            $etp = 110;
+            $km = 0.62;
+            $nuit = 80;
+            $rep = 25;
+            $nbETP = $lesFrais['ETP'];
+            $nbKM = $lesFrais['KM'];
+            $nbNUIT = $lesFrais['NUI'];
+            $nbREP = $lesFrais['REP'];
+//            foreach ($lesFrais as $unFrais) {
+//                $libelle = $unFrais['idFraisForfait'];
+//                switch ($libelle) {
+//                    case "ETP": {
+//                        $nbETP = $unFrais['quantite'];
+//                        break;
+//                    }
+//                    case "KM": {
+//                        $nbKM = $unFrais['quantite'];
+//                        break;
+//                    }
+//                    case "NUI": {
+//                        $nbNUIT = $unFrais['quantite'];
+//                        break;
+//                    }
+//                    case "REP": {
+//                        $nbREP = $unFrais['quantite'];
+//                        break;
+//                    }
+//                }
+//            }
+            $montantValide = $nbETP * $etp + $nbKM * $km + $nbNUIT * $nuit + $nbREP * $rep;
+            $horsForfait = $this->getLesFraisHorsForfait($idVisiteur, $mois);
+            foreach ($horsForfait as $unHorsForfait) {
+                $montantValide += $unHorsForfait['montant'];
+            }
+            return $montantValide;
+        }
+        
+        public function majMontant($idVisiteur, $mois, $montant) {
+            $req = "update ficheFrais set montantValide = '$montant', dateModif = now() 
+            where fichefrais.idvisiteur ='$idVisiteur' and fichefrais.mois = '$mois'";
+            PdoGsb::$monPdo->exec($req);
         }
 }
 ?>

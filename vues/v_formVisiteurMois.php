@@ -1,7 +1,7 @@
 <div id="contenu">
             <div>
-            <form action="index.php?uc=validerFrais&action=voirFraisVisiteur" method="post">
-                    <h1> Validation des frais de <?php echo $infosVisiteur['prenom']." ".$infosVisiteur['nom'];?></h1>
+            <form action="index.php?uc=validerFrais&action=majVisiteur" method="post">
+                    <h1> Validation des frais de <?php echo $infosVisiteur['prenom']." ".$infosVisiteur['nom']." du ".$afficheMois;?></h1>
                     <label>Choisir le visiteur :</label>
                             <select name="visiteur">
                                 <?php
@@ -23,7 +23,7 @@
                             </select>
                             <input id="ok" type="submit" value="Valider" size="20" />
             </form>
-            <form action="index.php?uc=validerFrais&action=voirFraisVisiteur" method="post">
+            <form action="index.php?uc=validerFrais&action=majMois" method="post">
                     <label>Choisir le mois :</label>
                     <select id="lstMois" name="mois">
                     <?php

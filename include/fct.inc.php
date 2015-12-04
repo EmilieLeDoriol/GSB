@@ -65,17 +65,23 @@ function getMois($date){
 		}
 		return $annee.$mois;
 }
-
 /**
- * retourne le jour de la date actuelle
- 
- * @param $date
- * @return le jour
+ * retourne le mois au format jj/mm/aaaa
+ * 
+ * @param $mois
+ * @return le mois au format jj/mm/aaaa
  */
-function getJour($date) {
-        return substr($date,0,2);
+function moisFutur($mois) {
+    $numAnnee =substr( $mois,0,4);
+    $numMois =substr( $mois,4,2);
+    if ($numMois == "12") {
+        $numMois = "1";
+        $numAnnee += 1;
+    } else {
+        $numMois += 1;
+    }
+    return $numAnnee."0".$numMois;
 }
-
 /* gestion des erreurs*/
 /**
  * Indique si une valeur est un entier positif ou nul
