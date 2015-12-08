@@ -68,7 +68,7 @@
                 echo $messageDejaValide;
             }
         ?>
-        <div><input class="zone"type="reset" /><input class="zone" <?php if ($dejaValide){echo $disable;}?> type="submit" /></div>
+        <div><input class="zone"type="reset" /><input class="zone" <?php if ($dejaValide){echo $disable;}?> type="submit" value="VALIDER LA FICHE"/></div>
 
     </form>
 </div>
