@@ -1,6 +1,7 @@
 <?php
 include("vues/v_sommaireComptable.php");
 $action = $_REQUEST['action'];
+$dejaValide = false;
 switch($action){
         case 'selectionnerVisiteur':{
                 $lesVisiteurs = $pdo->getInfosVisiteurs();
@@ -90,6 +91,12 @@ if ($action != "selectionnerVisiteur") {
     $lesInfosFicheFrais = $pdo->getLesInfosFicheFrais($idVisiteur,$mois);
     $afficheMois =substr( $moisASelectionner,4,2)."/".substr( $moisASelectionner,0,4);
     $libEtat = $lesInfosFicheFrais['libEtat'];
+    $idEtat = $lesInfosFicheFrais['idEtat'];
+    if ($idEtat == 'VA' || $idEtat == 'RB') {
+        $dejaValide = true;
+        $messageDejaValide = "Vous ne pouvez pas modifier une fiche déjà validée ou remboursée.";
+        $disable = 'disabled="disabled"';
+    }
     $montantValide = $lesInfosFicheFrais['montantValide'];
     $nbJustificatifs = $lesInfosFicheFrais['nbJustificatifs'];
     $dateModif =  $lesInfosFicheFrais['dateModif'];

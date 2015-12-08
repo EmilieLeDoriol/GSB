@@ -29,7 +29,12 @@
                         ?>Il n'y a pas de frais hors forfait.<?php
                     }
                     else {
-                        ?><tr><th>Date</th><th>Libellé </th><th>Montant</th><th>Supprimer</th><th>Reporter</th></tr><?php
+                        ?><tr><th>Date</th><th>Libellé </th><th>Montant</th>
+                            <?php
+                                if (!$dejaValide) {
+                                    ?><th>Supprimer</th><th>Reporter</th></tr><?php
+                                }
+                            
                         foreach ( $lesFraisHorsForfait as $unFraisHorsForfait ) {
                             $date = $unFraisHorsForfait['date'];
                             $libelle = $unFraisHorsForfait['libelle'];
@@ -40,10 +45,14 @@
                                 <td width="100" ><input type="text" size="12" name="hfDate[<?php echo $idHorsForfait ?>]" value="<?php echo $date?>"/></td>
                                 <td width="220"><input type="text" size="40" name="hfLib[<?php echo $idHorsForfait ?>]" value="<?php echo $libelle?>"/></td> 
                                 <td width="90"> <input type="text" size="10" name="hfMont[<?php echo $idHorsForfait ?>]" value="<?php echo $montant?>"/></td>
-                                <td><a href="index.php?uc=validerFrais&action=supprimerFrais&idHorsForfait=<?php echo $idHorsForfait ?>" 
-				onclick="return confirm('Voulez-vous vraiment supprimer ce frais?');">Supprimer</a></td>
-                                <td><a href="index.php?uc=validerFrais&action=reporterFrais&idHorsForfait=<?php echo $idHorsForfait ?>" 
-				onclick="return confirm('Voulez-vous vraiment reporter ce frais?');">Reporter</a></td>
+                                <?php
+                                if (!$dejaValide) {
+                                    ?><td><a href="index.php?uc=validerFrais&action=supprimerFrais&idHorsForfait=<?php echo $idHorsForfait ?>" 
+                                    onclick="return confirm('Voulez-vous vraiment supprimer ce frais?');">Supprimer</a></td>
+                                    <td><a href="index.php?uc=validerFrais&action=reporterFrais&idHorsForfait=<?php echo $idHorsForfait ?>" 
+                                    onclick="return confirm('Voulez-vous vraiment reporter ce frais?');">Reporter</a></td><?php
+                                }
+                                ?>
                             </tr>
                             <?php
                         }
@@ -55,8 +64,11 @@
             if(!empty($message)) {
                 echo $message;
             }
+            if ($dejaValide) {
+                echo $messageDejaValide;
+            }
         ?>
-        <div><input class="zone"type="reset" /><input class="zone"type="submit" /></div>
+        <div><input class="zone"type="reset" /><input class="zone" <?php if ($dejaValide){echo $disable;}?> type="submit" /></div>
 
     </form>
 </div>

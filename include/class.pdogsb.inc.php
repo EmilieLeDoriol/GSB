@@ -142,8 +142,6 @@ class PdoGsb{
 		return $lesLignes;
 	}
 /**
- * Met à jour la table ligneFraisForfait
- 
  * Met à jour la table ligneFraisForfait pour un visiteur et
  * un mois donné en enregistrant les nouveaux montants
  
@@ -386,7 +384,8 @@ class PdoGsb{
         }
         
 /**
- * 
+ * Calcul le montant à valider pour une fiche
+ *
  * @param $idVisiteur
  * @param $mois
  * @param $lesFrais
@@ -401,27 +400,6 @@ class PdoGsb{
             $nbKM = $lesFrais['KM'];
             $nbNUIT = $lesFrais['NUI'];
             $nbREP = $lesFrais['REP'];
-//            foreach ($lesFrais as $unFrais) {
-//                $libelle = $unFrais['idFraisForfait'];
-//                switch ($libelle) {
-//                    case "ETP": {
-//                        $nbETP = $unFrais['quantite'];
-//                        break;
-//                    }
-//                    case "KM": {
-//                        $nbKM = $unFrais['quantite'];
-//                        break;
-//                    }
-//                    case "NUI": {
-//                        $nbNUIT = $unFrais['quantite'];
-//                        break;
-//                    }
-//                    case "REP": {
-//                        $nbREP = $unFrais['quantite'];
-//                        break;
-//                    }
-//                }
-//            }
             $montantValide = $nbETP * $etp + $nbKM * $km + $nbNUIT * $nuit + $nbREP * $rep;
             $horsForfait = $this->getLesFraisHorsForfait($idVisiteur, $mois);
             foreach ($horsForfait as $unHorsForfait) {
@@ -429,11 +407,24 @@ class PdoGsb{
             }
             return $montantValide;
         }
-        
+/**
+ * Met à jour le montant validé pour une fiche
+ * 
+ * @param $idVisiteur
+ * @param $mois
+ * @param $montant
+ */
         public function majMontant($idVisiteur, $mois, $montant) {
             $req = "update ficheFrais set montantValide = '$montant', dateModif = now() 
             where fichefrais.idvisiteur ='$idVisiteur' and fichefrais.mois = '$mois'";
             PdoGsb::$monPdo->exec($req);
+        }
+        
+        public function getFraisValide() {
+            $req = "select nom, prenom, id, idVisiteur, mois from fichefrais inner join visiteur on fichefrais.idVisiteur = visiteur.id where idEtat = 'VA'";
+            $res = PdoGsb::$monPdo->query($req);
+            $lesFiches = $res->fetchAll();
+            return $lesFiches;
         }
 }
 ?>
