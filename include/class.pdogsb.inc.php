@@ -382,6 +382,25 @@ class PdoGsb{
             $this->creeNouveauFraisHorsForfait($idVisiteur,$moisFutur,$libelle,$date,$montant);
            
         }
+ /**
+  * Retourne un tableau associatif des frais hors forfait non refusé
+  * 
+  * @param $idVisiteur
+  * @param $mois
+  * @return les frais hors forfait non refusé
+  */       
+        public function getHorsForfaitNonRefuse($idVisiteur,$mois){
+	    $req = "select * from lignefraishorsforfait where lignefraishorsforfait.idvisiteur ='$idVisiteur' 
+            and lignefraishorsforfait.mois = '$mois' and libelle NOT LIKE 'REFUSE%' ";	
+            $res = PdoGsb::$monPdo->query($req);
+            $lesLignes = $res->fetchAll();
+            $nbLignes = count($lesLignes);
+            for ($i=0; $i<$nbLignes; $i++){
+                    $date = $lesLignes[$i]['date'];
+                    $lesLignes[$i]['date'] =  dateAnglaisVersFrancais($date);
+            }
+            return $lesLignes; 
+	}
         
 /**
  * Calcul le montant à valider pour une fiche
@@ -401,7 +420,7 @@ class PdoGsb{
             $nbNUIT = $lesFrais['NUI'];
             $nbREP = $lesFrais['REP'];
             $montantValide = $nbETP * $etp + $nbKM * $km + $nbNUIT * $nuit + $nbREP * $rep;
-            $horsForfait = $this->getLesFraisHorsForfait($idVisiteur, $mois);
+            $horsForfait = $this->getHorsForfaitNonRefuse($idVisiteur, $mois);
             foreach ($horsForfait as $unHorsForfait) {
                 $montantValide += $unHorsForfait['montant'];
             }
@@ -419,12 +438,18 @@ class PdoGsb{
             where fichefrais.idvisiteur ='$idVisiteur' and fichefrais.mois = '$mois'";
             PdoGsb::$monPdo->exec($req);
         }
-        
+/**
+ * Retourne les mois des fiches qui sont validés ainsi que les nom, prénom, et id du visiteur correspondant
+ * 
+ * @return $lesFiches
+ */        
         public function getFraisValide() {
             $req = "select nom, prenom, id, idVisiteur, mois from fichefrais inner join visiteur on fichefrais.idVisiteur = visiteur.id where idEtat = 'VA'";
             $res = PdoGsb::$monPdo->query($req);
             $lesFiches = $res->fetchAll();
             return $lesFiches;
         }
+        
+        
 }
 ?>
